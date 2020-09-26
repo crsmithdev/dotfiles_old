@@ -1,0 +1,64 @@
+#
+# A clean but informative theme based on Sorin Ionescu's
+#
+# Authors:
+#   Santiago Suarez Ordoñez <santiycr@gmail.com>
+#
+# Screenshots:
+#   http://i.imgur.com/4ArSAKB.png
+#   http://i.imgur.com/5Fxg2z8.png
+#
+
+# Load dependencies.
+pmodload 'helper'
+
+function prompt_santiycr_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+}
+
+function prompt_santiycr_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_santiycr_precmd
+
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:action' format '%F{7}:%f%%B%F{9}%s%f%%b'
+  zstyle ':prezto:module:git:info:added' format ' %%B%F{2}✚%f%%b'
+  zstyle ':prezto:module:git:info:ahead' format ' %%B%F{13}⬆%f%%b'
+  zstyle ':prezto:module:git:info:behind' format ' %%B%F{13}⬇%f%%b'
+  zstyle ':prezto:module:git:info:branch' format ' %%B%F{2}%b%f%%b'
+  zstyle ':prezto:module:git:info:commit' format ' %%B%F{3}%.7c%f%%b'
+  zstyle ':prezto:module:git:info:deleted' format ' %%B%F{1}✖%f%%b'
+  zstyle ':prezto:module:git:info:modified' format ' %%B%F{4}✱%f%%b'
+  zstyle ':prezto:module:git:info:position' format ' %%B%F{13}%p%f%%b'
+  zstyle ':prezto:module:git:info:renamed' format ' %%B%F{5}➜%f%%b'
+  zstyle ':prezto:module:git:info:stashed' format ' %%B%F{6}✭%f%%b'
+  zstyle ':prezto:module:git:info:unmerged' format ' %%B%F{3}═%f%%b'
+  zstyle ':prezto:module:git:info:untracked' format ' %%B%F{7}◼%f%%b'
+  zstyle ':prezto:module:git:info:keys' format \
+    'prompt' '$(coalesce "%b" "%p" "%c")%s%A%B%S%a%d%m%r%U%u' \
+    'rprompt' '%C%D'
+
+  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -n "$SSH_CONNECTION" ]; then
+    HOS=" %F{magenta}☁ %f (%F{yellow}%m%f)"
+  else
+    HOS=""
+  fi
+  PROMPT='%F{4}%2~$HOS${git_info:+ %F{2\}❯%f${(e)git_info[prompt]}} %B%F{1}❯%F{3}❯%F{2}❯%f%b '
+  RPROMPT=''
+  SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
+}
+
+prompt_santiycr_setup "$@"
